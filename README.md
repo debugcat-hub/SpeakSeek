@@ -1,9 +1,6 @@
-
-##  SpeakSeek
+# SpeakSeek
 
 ![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)
-![Issues](https://img.shields.io/github/issues/catmeowdebug/SpeakSeek)
-![Stars](https://img.shields.io/github/stars/catmeowdebug/SpeakSeek?style=social)
 ![Python](https://img.shields.io/badge/python-3.8+-blue.svg)
 ![PyTorch](https://img.shields.io/badge/PyTorch-2.0+-orange.svg)
 ![Gradio](https://img.shields.io/badge/Gradio-4.0+-green.svg)
@@ -12,14 +9,14 @@ An AI-powered system for automatic speaker identification and video clip extract
 
 ## Features
 
-* Face Recognition: Identify target speakers across video frames using InsightFace
-* Lip-Sync Analysis: SyncNet-based audio-visual synchronization detection
-* Speaker Diarization: Automatic "who spoke when" identification via PyAnnotate
-* Composite Scoring: Intelligent confidence analysis combining multiple metrics
-* Smart Extraction: Generate speaker-specific video clips with temporal grouping
-* Visualization: Real-time confidence graphs and analytics
-* Web Interface: Easy-to-use Gradio-based UI
-* Interactive Chatbot: Ask natural language questions about extracted clips using a chat-based interface
+- **Face Recognition**: Identify target speakers across video frames using InsightFace
+- **Lip-Sync Analysis**: SyncNet-based audio-visual synchronization detection
+- **Speaker Diarization**: Automatic "who spoke when" identification via PyAnnotate
+- **Composite Scoring**: Intelligent confidence analysis combining multiple metrics
+- **Smart Extraction**: Generate speaker-specific video clips with temporal grouping
+- **Visualization**: Real-time confidence graphs and analytics
+- **Web Interface**: Easy-to-use Gradio-based UI
+- **Interactive Chatbot**: Ask natural language questions about extracted clips
 
 ## Use Cases
 
@@ -35,11 +32,13 @@ An AI-powered system for automatic speaker identification and video clip extract
 
 The pipeline combines multiple AI technologies:
 
-1. Face Detection & Recognition (InsightFace + MediaPipe)
-2. Audio Processing (Librosa + PyAnnotate)
-3. Lip-Sync Detection (Custom SyncNet implementation)
-4. Temporal Analysis (Composite scoring with Gaussian smoothing)
-5. Video Processing (MoviePy + FFmpeg)
+1. **Face Detection & Recognition** (InsightFace + MediaPipe)
+2. **Audio Processing** (Librosa + PyAnnotate)
+3. **Lip-Sync Detection** (Custom SyncNet implementation)
+4. **Temporal Analysis** (Composite scoring with Gaussian smoothing)
+5. **Video Processing** (MoviePy + FFmpeg)
+6. **Transcription** (Faster-Whisper)
+7. **Chat Interface** (Hugging Face Inference API)
 
 ## Requirements
 
@@ -51,8 +50,9 @@ The pipeline combines multiple AI technologies:
 
 ### API Keys Required
 
-* Hugging Face account and token
-* PyAnnotate API key for speaker diarization
+- **Hugging Face account and token** - Get from [https://huggingface.co/settings/tokens](https://huggingface.co/settings/tokens)
+- **PyAnnotate API key** - Get from [https://pyannote.ai](https://pyannote.ai)
+- **HF Dataset Repository** - Create a dataset repo on Hugging Face for temporary audio uploads
 
 ### Hardware Recommendations
 
@@ -66,8 +66,8 @@ The pipeline combines multiple AI technologies:
 ### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/video-speaker-analysis-pipeline.git
-cd video-speaker-analysis-pipeline
+git clone https://github.com/catmeowdebug/SpeakSeek.git
+cd SpeakSeek
 ```
 
 ### 2. Create Virtual Environment
@@ -85,31 +85,41 @@ pip install -r requirements.txt
 
 ### 4. Install System Dependencies
 
+#### Ubuntu/Debian
 ```bash
-# Ubuntu/Debian
 sudo apt update
 sudo apt install ffmpeg
-
-# macOS
-brew install ffmpeg
-
-# Windows
-# Download FFmpeg from https://ffmpeg.org/download.html
 ```
 
-### 5. Setup API Keys
+#### macOS
+```bash
+brew install ffmpeg
+```
 
-Create a `.env` file in the project root:
+#### Windows
+Download FFmpeg from [https://ffmpeg.org/download.html](https://ffmpeg.org/download.html) and add to PATH.
+
+### 5. Setup Configuration (Optional)
+
+Copy the example environment file:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env` and add your API credentials:
 
 ```env
 HUGGING_FACE_TOKEN=your_hf_token_here
 PYANNOTE_TOKEN=your_pyannote_token_here
-HF_REPO_ID=your_username/your_repo_name
+HF_REPO_ID=your_username/your_dataset_repo
 ```
+
+Note: You can also enter these credentials directly in the web interface.
 
 ## Usage
 
-### Web Interface (Standard UI)
+### Launch the Application
 
 ```bash
 python app.py
@@ -117,47 +127,52 @@ python app.py
 
 Then open [http://localhost:7860](http://localhost:7860) in your browser.
 
-### Chatbot Interface
+### Using the Web Interface
 
-The pipeline includes a chat-based interface that allows users to ask natural language questions about the content of speaker clips. For example:
+1. **Upload Video**: Select a video file (MP4, AVI, MOV)
+2. **Upload Reference Image**: Provide a clear photo of the target speaker
+3. **Configure API Keys**:
+   - Enter your Hugging Face token
+   - Enter your PyAnnotate API key
+   - Enter your HF dataset repository ID (format: `username/repo-name`)
+4. **Select Device**: Choose CPU or CUDA (if available)
+5. **Run Analysis**: Click "Run Analysis" button
+6. **View Results**:
+   - Check the status updates
+   - View the confidence analysis graph
+   - Browse matched frames
+   - Download generated clips and analysis files
+7. **Chat with Transcripts**:
+   - Switch to the "Chat with Transcripts" tab
+   - Ask questions about the video content
+   - Get AI-powered answers based on the transcripts
 
-* "Where is the speaker talking about deadlines?"
-* "Summarize what was said in this clip."
-* "What was the opinion expressed?"
+### Chat Examples
 
-To launch the chatbot:
+Once clips are transcribed, you can ask questions like:
 
-```bash
-python app.py
+- "What did the speaker say about deadlines?"
+- "Summarize the main points discussed."
+- "Which clip contains discussion about the project timeline?"
+- "What is the speaker's opinion in these clips?"
+
+## Project Structure
+
 ```
-
-Then open [http://localhost:7860](http://localhost:7860) and use the interactive chat interface.
-
-This interface processes clips located in the output directory and analyzes them via transcript-to-LLM pipelines.
-
-### Command Line Usage
-
-```python
-from video_processor import VideoProcessor
-from audio_processor import AudioProcessor
-
-video_proc = VideoProcessor()
-audio_proc = AudioProcessor()
-
-results = run_pipeline(
-    video_path="path/to/video.mp4",
-    reference_image="path/to/reference.jpg",
-    hf_token="your_token",
-    pyannotate_token="your_token",
-    repo_id="username/repo"
-)
+SpeakSeek/
+├── app.py                  # Main Gradio application
+├── config.py              # Configuration settings
+├── models.py              # SyncNet model implementation
+├── face_analyzer.py       # Face recognition and lip detection
+├── video_processor.py     # Video processing pipeline
+├── audio_processor.py     # Audio diarization
+├── transcription.py       # Whisper transcription and chat
+├── pipeline_utils.py      # Helper utilities
+├── requirements.txt       # Python dependencies
+├── .env.example          # Environment variables template
+├── README.md             # This file
+└── Main code             # Legacy entry point (deprecated)
 ```
-
-### Input Requirements
-
-* Video: MP4, AVI, MOV formats supported
-* Reference Image: Clear photo of target speaker (JPG, PNG)
-* Video Quality: 720p+ recommended for better face detection
 
 ## How It Works
 
@@ -213,106 +228,103 @@ composite_score = 0.7 * lip_motion_score + 0.3 * sync_confidence
 
 ### Adjustable Parameters
 
-```python
-FACE_SIMILARITY_THRESHOLD = 0.6
-LIP_MOTION_WEIGHT = 0.7
-SYNC_CONFIDENCE_WEIGHT = 0.3
-SEGMENT_MERGE_THRESHOLD = 1.0
-GAUSSIAN_SIGMA = 3
-```
-
-### Performance Tuning
+Edit `config.py` to modify:
 
 ```python
-# For faster processing
-VIDEO_RESOLUTION = (640, 480)
-KEYFRAME_INTERVAL = 2  # seconds
-
-# For better accuracy
-VIDEO_RESOLUTION = (1280, 720)
-KEYFRAME_INTERVAL = 0.5  # seconds
+FACE_SIMILARITY_THRESHOLD = 0.6    # Face matching threshold (0-1)
+LIP_MOTION_WEIGHT = 0.7            # Weight for lip motion in composite score
+SYNC_CONFIDENCE_WEIGHT = 0.3       # Weight for sync confidence
+SEGMENT_MERGE_THRESHOLD = 1.0      # Seconds gap to merge segments
+GAUSSIAN_SIGMA = 3                 # Smoothing sigma for visualization
 ```
 
-## Testing
+## Output Files
 
-### Run the test suite
+The pipeline generates:
 
-```bash
-python -m pytest tests/ -v
-```
-
-### Test with sample data
-
-```bash
-python test_pipeline.py --video sample_video.mp4 --reference sample_face.jpg
-```
+- **Video Clips**: `clip_1_start-end.mp4`, `clip_2_start-end.mp4`, etc.
+- **Analysis Data**: `lip_motion_scores.csv` with frame-by-frame confidence
+- **Speaker Mapping**: `matched_with_speakers.csv` with speaker assignments
+- **Visualizations**: `speech_confidence.png` with confidence graphs
+- **Diarization**: `diarization_output.csv` with speaker timestamps
+- **Transcripts**: Text files for each clip
 
 ## Troubleshooting
 
 ### Common Issues
 
-**1. No faces detected**
+**No faces detected**
+- Use a clear, front-facing reference image
+- Ensure good lighting in both reference and video
+- Try a different reference frame
 
-* Use a clear, front-facing reference image
-* Improve lighting conditions
-* Ensure the image format is supported
+**PyAnnotate API errors**
+- Validate your API key is correct
+- Check your PyAnnotate quota/credits
+- Ensure the dataset repository exists and is accessible
 
-**2. PyAnnotate API errors**
+**CUDA out of memory**
+- Switch to CPU processing
+- Process shorter video segments
+- Close other GPU-intensive applications
 
-* Validate API key
-* Ensure successful audio upload
-* Check for quota limits
+**Poor sync detection**
+- Ensure video has clear audio track
+- Check video quality (720p+ recommended)
+- Verify face is clearly visible in frames
 
-**3. CUDA out of memory**
-
-* Reduce batch size or use CPU
-* Process shorter video chunks
-* Lower resolution
-
-**4. Poor sync detection**
-
-* Ensure audio is not corrupted
-* Improve video quality
-* Adjust detection thresholds
+**Chat not working**
+- Ensure Hugging Face token is valid
+- Wait for model to load (may take 20-30 seconds first time)
+- Check internet connection
 
 ### Performance Issues
 
 **Slow Processing**
-
-* Enable GPU acceleration
-* Reduce input resolution
-* Process only selected segments
+- Enable CUDA if you have a compatible GPU
+- Reduce input video resolution
+- Process shorter clips initially
 
 **High Memory Usage**
+- Close other applications
+- Process video in smaller chunks
+- Use CPU instead of GPU if RAM is limited
 
-* Split video into smaller parts
-* Free memory between steps
-* Use float16 models if possible
+## Development
+
+### Running Tests
+
+```bash
+python -m pytest tests/ -v
+```
+
+### Code Style
+
+The project follows a modular architecture with:
+- Separation of concerns across modules
+- Proper resource cleanup and error handling
+- Type hints where appropriate
+- Comprehensive logging
 
 ## Contributing
 
-We welcome contributions! To contribute:
+Contributions are welcome! To contribute:
 
 1. Fork the repository
-2. Create a new branch: `git checkout -b feature/my-feature`
+2. Create a feature branch: `git checkout -b feature/my-feature`
 3. Commit your changes
-4. Push the branch
+4. Push to the branch
 5. Open a pull request
-
-### Development Setup
-
-```bash
-pip install -r requirements-dev.txt
-pre-commit install
-```
 
 ## Acknowledgments
 
-* InsightFace – Face recognition
-* PyAnnotate – Speaker diarization
-* SyncNet – Audio-visual sync
-* MediaPipe – Facial landmarks
-* Gradio – Web UI
+- **InsightFace** - Face recognition framework
+- **PyAnnotate** - Speaker diarization
+- **SyncNet** - Audio-visual synchronization
+- **MediaPipe** - Facial landmark detection
+- **Gradio** - Web interface framework
+- **Faster-Whisper** - Fast transcription
+- **Hugging Face** - Model hosting and inference
 
 ## Research Papers
 
@@ -320,29 +332,36 @@ pre-commit install
 * [InsightFace: 2D and 3D Face Analysis](https://arxiv.org/abs/1801.07698)
 * [pyannote.audio: Neural Speech Processing](https://arxiv.org/abs/1911.01255)
 
-## Links
-
-* [Issues](https://github.com/catmeowdebug/SpeakSeek/issues)
-
 ## Performance Benchmarks
 
 | Video Length | Processing Time | Memory Usage | Accuracy |
 | ------------ | --------------- | ------------ | -------- |
-| 5 minutes    | 2–3 minutes     | 4 GB RAM     | 92%      |
-| 30 minutes   | 10–15 minutes   | 8 GB RAM     | 89%      |
-| 2 hours      | 45–60 minutes   | 12 GB RAM    | 87%      |
+| 5 minutes    | 2-3 minutes     | 4 GB RAM     | 92%      |
+| 30 minutes   | 10-15 minutes   | 8 GB RAM     | 89%      |
+| 2 hours      | 45-60 minutes   | 12 GB RAM    | 87%      |
 
 *Tested on Intel i7-10700K with RTX 3070*
 
+## License
+
+MIT License - see LICENSE file for details
+
+## Links
+
+- [GitHub Repository](https://github.com/catmeowdebug/SpeakSeek)
+- [Issues](https://github.com/catmeowdebug/SpeakSeek/issues)
+
 ## Roadmap
 
-* [ ] Real-time processing
-* [ ] Multi-speaker simultaneous tracking
-* [ ] Emotion detection
-* [ ] Mobile app support
-* [ ] Cloud deployment integration
-* [ ] Public API access
+- [ ] Real-time processing support
+- [ ] Multi-speaker simultaneous tracking
+- [ ] Emotion detection integration
+- [ ] Mobile app support
+- [ ] Cloud deployment (Docker)
+- [ ] Public API access
+- [ ] Batch processing mode
+- [ ] Custom model fine-tuning
 
 ---
 
-If you need this turned into a clean `README.md` file or pushed to your GitHub repo automatically, I can guide you on that too. Let me know.
+Made with care by the SpeakSeek team
